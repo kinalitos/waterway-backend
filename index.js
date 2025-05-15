@@ -6,4 +6,4 @@ const server = http.createServer(app);
 
 
 
-server.listen(port, () => console.log(`Server listening at http://localhost:${port}`));
+server.listen(port, () => console.log(`Server listening at http://localhost:${port} Swagger docs en http://localhost:3000/api-docs`));

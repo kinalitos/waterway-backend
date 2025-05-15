@@ -6,11 +6,17 @@ const mongoose = require('mongoose');
 require('dotenv').config(); // Cargar variables de entorno desde el archivo .env
 const cors = require('cors');
 
+//SWAGGER
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./swagger');
+
+
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use('/uploads', express.static('uploads'));
 app.use(cors());
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // MongoDB
 const uri = process.env.MONGODB_URI ;
