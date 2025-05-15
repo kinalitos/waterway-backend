@@ -1,17 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const eventController = require('../controller/event');
-const checkAuth = require('../middleware/auth.middleware');
+const { authenticateToken } = require('../middleware/auth.middleware');
 
-router.post('/', checkAuth, eventController.createEvent);
+router.post('/', authenticateToken, eventController.createEvent);
 router.get('/', eventController.getAllEvents);
 router.get('/:id', eventController.getEventById);
-router.put('/:id', checkAuth, eventController.updateEvent);
-router.delete('/:id', checkAuth, eventController.deleteEvent);
+router.put('/:id', authenticateToken, eventController.updateEvent);
+router.delete('/:id', authenticateToken, eventController.deleteEvent);
 
 // Agregar imagen a un evento
-router.post('/:id/images', checkAuth, eventController.addImage);
+router.post('/:id/images', authenticateToken, eventController.addImage);
 // Agregar participante a un evento
-router.post('/:id/participants', checkAuth, eventController.addParticipant);
+router.post('/:id/participants', authenticateToken, eventController.addParticipant);
 
 module.exports = router;
