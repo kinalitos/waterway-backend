@@ -36,5 +36,7 @@ app.use('/contamination-reports', require('./api/routes/contaminationReport'));
 app.use('/publications', require('./api/routes/publication'));
 app.use('/users', require('./api/routes/user'));
 app.use('/auth', require('./api/routes/auth'));
+app.use('/test', require('./api/routes/test'));
+
 
 module.exports = app;
