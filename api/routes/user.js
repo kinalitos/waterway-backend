@@ -1,25 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const checkAuth = require('../middleware/auth.middleware');
+const { authenticateToken } = require('../middleware/auth.middleware');
 const {
   createUser,
   getAllUsers,
   getUserById,
   updateUser,
   deleteUser,
-  signupUser,
-  loginUser
 } = require('../controller/user');
 
-// Rutas protegidas
-router.post('/', checkAuth, createUser);           // Crear usuario (admin/moderador)
-router.get('/', checkAuth, getAllUsers);           // Obtener todos los usuarios
-router.get('/:id', checkAuth, getUserById);        // Obtener usuario por ID
-router.put('/:id', checkAuth, updateUser);         // Actualizar usuario
-router.delete('/:id', checkAuth, deleteUser);      // Eliminar usuario
-
-// Rutas públicas
-router.post('/signup', signupUser);                // Registro público
-router.post('/login', loginUser);                  // Login público
+router.post('/', authenticateToken, createUser);
+router.get('/', authenticateToken, getAllUsers);
+router.get('/:id', authenticateToken, getUserById);
+router.put('/:id', authenticateToken, updateUser);
+router.delete('/:id', authenticateToken, deleteUser);
 
 module.exports = router;

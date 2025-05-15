@@ -1,15 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const contaminationController = require('../controller/contaminationReport');
-const checkAuth = require('../middleware/auth.middleware');
+const { authenticateToken } = require('../middleware/auth.middleware');
 
-router.post('/', checkAuth, contaminationController.createReport);
+router.post('/', authenticateToken, contaminationController.createReport);
 router.get('/', contaminationController.getAllReports);
 router.get('/:id', contaminationController.getReportById);
-router.put('/:id', checkAuth, contaminationController.updateReport);
-router.delete('/:id', checkAuth, contaminationController.deleteReport);
+router.put('/:id', authenticateToken, contaminationController.updateReport);
+router.delete('/:id', authenticateToken, contaminationController.deleteReport);
 
 // Agregar imagen a un reporte
-router.post('/:id/images', checkAuth, contaminationController.addImage);
+router.post('/:id/images', authenticateToken, contaminationController.addImage);
 
 module.exports = router;

@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
-const User = require('../models/user');
+const User = require('../model/user');
 
 // Crear usuario (solo admins o moderadores)
 exports.createUser = async (req, res) => {

@@ -3,7 +3,7 @@ const app = express();
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-require('dotenv').config(); // Cargar variables de entorno desde el archivo .env
+require('dotenv').config();
 const cors = require('cors');
 
 app.use(morgan('dev'));
@@ -22,12 +22,13 @@ mongoose
     ssl: true, // Asegura que SSL esté habilitado
   })
   .then(() => console.log("Conexión exitosa a MongoDB Atlas"))
-  .catch((err) => console.error("Error conectando a MongoDB Atlas:", err));
+  .catch((err) => console.error("Error conectando   a MongoDB Atlas:", err));
 
 // Rutas
 app.use('/events', require('./api/routes/event'));
 app.use('/contamination-reports', require('./api/routes/contaminationReport'));
 app.use('/publications', require('./api/routes/publication'));
+app.use('/users', require('./api/routes/user'));
 app.use('/auth', require('./api/routes/auth'));
 
 module.exports = app;
