@@ -30,7 +30,8 @@ exports.getEventById = async (req, res) => {
     const event = await Event.findById(req.params.id);
     if (!event) return res.status(404).json({ error: 'Not found' });
     const status = event.date_start < Date.now(0) ? 'finalizado' : 'activo';
-    res.json({...event, status});
+    event.status = status;
+    res.json({event});
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
