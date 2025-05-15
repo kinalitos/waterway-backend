@@ -2,13 +2,19 @@ const Event = require('../model/event');
 
 exports.createEvent = async (req, res) => {
   try {
-    const event = new Event(req.body);
-    await event.save();
-    res.status(201).json(event);
+    req.body.created_by = Date.now()
+    req.body.updated_by = Date.now()
+    req.body.created_by = req.user.id
+    if(req.body.date_end < req.body.date_start) {
+      return res.status(400).json({ error: 'La fecha de inicio no puede ser mayor a la fecha de fin' });
+    }
+    const event = new Event(req.body)
+    await event.save(event)
+    res.status(201).json(event)
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ error: err.message })
   }
-};
+}
 
 exports.getAllEvents = async (req, res) => {
   try {
@@ -23,7 +29,8 @@ exports.getEventById = async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
     if (!event) return res.status(404).json({ error: 'Not found' });
-    res.json(event);
+    const status = event.date_start < Date.now(0) ? 'finalizado' : 'activo';
+    res.json({...event, status});
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -31,6 +38,7 @@ exports.getEventById = async (req, res) => {
 
 exports.updateEvent = async (req, res) => {
   try {
+    req.body.updated_at = Date.now()
     const event = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!event) return res.status(404).json({ error: 'Not found' });
     res.json(event);
@@ -67,10 +75,33 @@ exports.addParticipant = async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
     if (!event) return res.status(404).json({ error: 'Not found' });
-    event.participants.push({ user_id: req.body.user_id });
+    event.participants.push({ user_id: req.user.id });
     await event.save();
     res.json(event);
   } catch (err) {
     res.status(400).json({ error: err.message });
+  }
+};
+
+
+exports.filterEvents = async (req, res) => {
+  try {
+    const { status, location, date_start, date_end, title } = req.query;
+    const filter = {};
+
+    if (status) filter.status = status;
+    if (location) filter.location = { $regex: location, $options: "i" };
+    if (title) filter.title = { $regex: title, $options: "i" };
+
+    if (date_start || date_end) {
+      filter.date_start = {};
+      if (date_start) filter.date_start.$gte = new Date(date_start);
+      if (date_end) filter.date_start.$lte = new Date(date_end);
+    }
+
+    const events = await Event.find(filter);
+    res.json(events);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };

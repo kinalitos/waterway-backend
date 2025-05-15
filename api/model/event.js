@@ -20,7 +20,6 @@ const eventSchema = new mongoose.Schema({
   date_start: { type: Date, required: true },
   date_end: { type: Date },
   location: { type: String, maxLength: 300 },
-  status: { type: String, default: 'active', maxLength: 50 },
   created_by: { type: String, ref: 'User' },
   images: [eventImageSchema],
   participants: [participantSchema]

@@ -8,6 +8,7 @@ router.get('/', eventController.getAllEvents);
 router.get('/:id', eventController.getEventById);
 router.put('/:id', authenticateToken, eventController.updateEvent);
 router.delete('/:id', authenticateToken, eventController.deleteEvent);
+router.get('/filter', eventController.filterEvents);
 
 // Agregar imagen a un evento
 router.post('/:id/images', authenticateToken, eventController.addImage);
