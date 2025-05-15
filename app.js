@@ -28,5 +28,6 @@ mongoose
 app.use('/events', require('./api/routes/event'));
 app.use('/contamination-reports', require('./api/routes/contaminationReport'));
 app.use('/publications', require('./api/routes/publication'));
+app.use('/auth', require('./api/routes/auth'));
 
 module.exports = app;
