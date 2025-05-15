@@ -2,8 +2,8 @@ const { v4: uuidv4 } = require('uuid');
 const jwt = require('jsonwebtoken');
 const User = require('../model/user');
 
-const ACCESS_SECRET = process.env.ACCESS_SECRET;
-const REFRESH_SECRET = process.env.REFRESH_SECRET;
+const ACCESS_SECRET_TOKEN = process.env.ACCESS_SECRET_TOKEN;
+const REFRESH_SECRET_TOKEN = process.env.REFRESH_SECRET_TOKEN;
 
 exports.signupUser = async (req, res) => {
   try {
@@ -62,13 +62,13 @@ exports.loginUser = async (req, res) => {
 
     const accessToken = jwt.sign(
       { id: user._id },
-      ACCESS_SECRET,
+      ACCESS_SECRET_TOKEN,
       { expiresIn: '15m' }
     );
 
     const refreshToken = jwt.sign(
       { id: user._id },
-      REFRESH_SECRET,
+      REFRESH_SECRET_TOKEN,
       { expiresIn: '7d' } // Suggest longer refresh expiry
     );
 
@@ -104,7 +104,7 @@ exports.refreshToken = async (req, res) => {
 
     let payload;
     try {
-      payload = jwt.verify(refreshToken, REFRESH_SECRET);
+      payload = jwt.verify(refreshToken, REFRESH_SECRET_TOKEN);
     } catch (err) {
       return res.status(403).json({
         success: false,
@@ -122,7 +122,7 @@ exports.refreshToken = async (req, res) => {
 
     const newAccessToken = jwt.sign(
       { id: user._id },
-      ACCESS_SECRET,
+      ACCESS_SECRET_TOKEN,
       { expiresIn: '15m' }
     );
 
