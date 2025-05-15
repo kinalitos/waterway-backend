@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true, maxLength: 200 },
   role: {
     type: String,
-    enum: ['usuario', 'investigador', 'empresa', 'moderador', 'administrador'],
+    enum: ['usuario', 'investigador', 'moderador', 'administrador'],
     required: true,
   },
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });

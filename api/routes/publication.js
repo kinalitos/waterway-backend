@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const publicationController = require('../controller/publication');
-const checkAuth = require('../middleware/check-auth');
+const checkAuth = require('../middleware/auth.middleware');
 
 router.post('/', checkAuth, publicationController.createPublication);
 router.get('/', publicationController.getAllPublications);
