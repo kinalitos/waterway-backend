@@ -74,3 +74,25 @@ exports.addParticipant = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
+
+exports.filterEvents = async (req, res) => {
+  try {
+    const { status, location, date_start, date_end, title } = req.query;
+    const filter = {};
+
+    if (status) filter.status = status;
+    if (location) filter.location = { $regex: location, $options: "i" };
+    if (title) filter.title = { $regex: title, $options: "i" };
+
+    if (date_start || date_end) {
+      filter.date_start = {};
+      if (date_start) filter.date_start.$gte = new Date(date_start);
+      if (date_end) filter.date_start.$lte = new Date(date_end);
+    }
+
+    const events = await Event.find(filter);
+    res.json(events);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
