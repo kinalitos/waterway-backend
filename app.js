@@ -6,11 +6,17 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 const cors = require('cors');
 
+//SWAGGER
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./swagger');
+
+
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use('/uploads', express.static('uploads'));
 app.use(cors());
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // MongoDB
 const uri = process.env.MONGODB_URI ;
@@ -30,5 +36,7 @@ app.use('/contamination-reports', require('./api/routes/contaminationReport'));
 app.use('/publications', require('./api/routes/publication'));
 app.use('/users', require('./api/routes/user'));
 app.use('/auth', require('./api/routes/auth'));
+app.use('/test', require('./api/routes/test'));
+
 
 module.exports = app;
