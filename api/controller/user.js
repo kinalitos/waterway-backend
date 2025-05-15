@@ -1,8 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
 const User = require('../models/user');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const saltRounds = 10;
 
 // Crear usuario (solo admins o moderadores)
 exports.createUser = async (req, res) => {
@@ -76,49 +73,5 @@ exports.deleteUser = async (req, res) => {
     res.status(200).json({ message: 'User Deleted Successfully' });
   } catch (err) {
     res.status(500).json({ error: err.message });
-  }
-};
-
-// Signup (registro público)
-exports.signupUser = async (req, res) => {
-  try {
-    const existingUser = await User.findOne({ email: req.body.email });
-    if (existingUser) {
-      return res.status(409).json({ message: 'Email Already Exists' });
-    }
-    const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
-    const newUser = new User({
-      _id: uuidv4(),
-      name: req.body.name,
-      email: req.body.email,
-      password: hashedPassword,
-      role: req.body.role || 'usuario',
-    });
-    await newUser.save();
-    return res.status(201).json({ message: 'User created successfully' });
-  } catch (error) {
-    return res.status(500).json({ error: error.message || 'Internal Server Error' });
-  }
-};
-
-// Login (público)
-exports.loginUser = async (req, res) => {
-  try {
-    const user = await User.findOne({ email: req.body.email });
-    if (!user) {
-      return res.status(401).json({ message: "Auth Failed" });
-    }
-    const match = await bcrypt.compare(req.body.password, user.password);
-    if (!match) {
-      return res.status(401).json({ message: "Auth Failed" });
-    }
-    const token = jwt.sign(
-      { email: user.email, userId: user._id, role: user.role },
-      'secrete',
-      { expiresIn: "1h" }
-    );
-    return res.status(200).json({ message: "Auth Successful", token });
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
   }
 };
