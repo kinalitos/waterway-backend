@@ -1,6 +1,7 @@
 const { v4: uuidv4 } = require('uuid');
 const jwt = require('jsonwebtoken');
 const User = require('../model/user');
+const bcrypt = require('bcrypt');
 
 const ACCESS_SECRET_TOKEN = process.env.ACCESS_SECRET_TOKEN;
 const REFRESH_SECRET_TOKEN = process.env.REFRESH_SECRET_TOKEN;
@@ -17,11 +18,13 @@ exports.signupUser = async (req, res) => {
       });
     }
 
+    const newPassword = await bcrypt.hash(password, 10);
+
     const newUser = new User({
       _id: uuidv4(),
       name,
       email,
-      password,
+      password: newPassword,
       role: role || 'usuario',
     });
 
@@ -52,7 +55,7 @@ exports.loginUser = async (req, res) => {
       });
     }
 
-    const isMatch = user.comparePassword(password);
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({
         success: false,
