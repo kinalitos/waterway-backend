@@ -142,6 +142,7 @@ router.put('/:id', authenticateToken, eventController.updateEvent);
  *         description: Evento no encontrado
  */
 router.delete('/:id', authenticateToken, eventController.deleteEvent);
+router.get('/filter', eventController.filterEvents);
 
 /**
  * @swagger
