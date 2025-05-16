@@ -18,7 +18,15 @@ exports.createEvent = async (req, res) => {
 
 exports.getAllEvents = async (req, res) => {
   try {
-    const events = await Event.find();
+    const { q } = req.query
+    const filter = q ? {
+      $or: [
+        { title: { $regex: q, $options: 'i' } },
+        { description: { $regex: q, $options: 'i' } },
+        { location: { $regex: q, $options: 'i' } }
+      ]
+    } : {}
+    const events = await Event.find(filter)
     res.json(events);
   } catch (err) {
     res.status(500).json({ error: err.message });
