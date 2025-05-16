@@ -141,3 +141,19 @@ exports.refreshToken = async (req, res) => {
     });
   }
 };
+exports.verifyAuth = async (req, res) => {
+  try {
+    res.status(200).json({
+      success: true,
+      message: "User access token verified correctly",
+      data: req.user,
+    })
+  } catch (err) {
+    console.error(err.message)
+    return res.status(500).json({
+      success: false,
+      message: "User could not be authenticated",
+      error: err.message,
+    })
+  }
+}
