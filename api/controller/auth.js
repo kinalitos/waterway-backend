@@ -60,6 +60,8 @@ exports.loginUser = async (req, res) => {
       });
     }
 
+    const role = user.role
+
     const accessToken = jwt.sign(
       { id: user._id },
       ACCESS_SECRET_TOKEN,
@@ -78,6 +80,7 @@ exports.loginUser = async (req, res) => {
       data: {
         accessToken,
         refreshToken,
+        role
       },
     });
   } catch (err) {
