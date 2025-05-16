@@ -2,8 +2,11 @@ const { Router } = require('express');
 const router = Router();
 const {
   signupUser,
-  loginUser
+  loginUser,
+  refreshToken,
+  verifyAuth,
 } = require('../controller/auth');
+const { authenticateToken } = require("../middleware/auth.middleware")
 
 /**
  * @swagger
@@ -91,5 +94,8 @@ router.post('/signup', signupUser);
  *         description: Error del servidor
  */
 router.post('/login', loginUser);
+
+router.get("/refresh-token", refreshToken)
+router.get("/verify", authenticateToken, verifyAuth)
 
 module.exports = router;
