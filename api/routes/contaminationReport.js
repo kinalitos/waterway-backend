@@ -60,7 +60,7 @@ const { authenticateToken } = require('../middleware/auth.middleware');
  *       400:
  *         description: Datos inválidos
  */
-router.post('/', authenticateToken, exports.createReport);
+router.post('/', authenticateToken, contaminationController.createReport);
 
 /**
  * @swagger
@@ -86,7 +86,7 @@ router.post('/', authenticateToken, exports.createReport);
  *       500:
  *         description: Error del servidor
  */
-router.get('/', authenticateToken, exports.getAllReports);
+router.get('/', authenticateToken, contaminationController.getAllReports);
 
 /**
  * @swagger
@@ -107,7 +107,7 @@ router.get('/', authenticateToken, exports.getAllReports);
  *       404:
  *         description: Reporte no encontrado
  */
-router.get('/:id', authenticateToken, exports.getReportById);
+router.get('/:id', authenticateToken, contaminationController.getReportById);
 
 /**
  * @swagger
@@ -165,7 +165,7 @@ router.get('/:id', authenticateToken, exports.getReportById);
  *       403:
  *         description: No autorizado
  */
-router.put('/:id', authenticateToken, exports.updateReport);
+router.put('/:id', authenticateToken, contaminationController.updateReport);
 
 /**
  * @swagger
@@ -190,7 +190,7 @@ router.put('/:id', authenticateToken, exports.updateReport);
  *       403:
  *         description: No autorizado
  */
-router.delete('/:id', authenticateToken, exports.deleteReport);
+router.delete('/:id', authenticateToken, contaminationController.deleteReport);
 
 /**
  * @swagger
@@ -229,7 +229,7 @@ router.delete('/:id', authenticateToken, exports.deleteReport);
  *       403:
  *         description: No autorizado
  */
-router.post('/:id/images', authenticateToken, exports.addImage);
+router.post('/:id/images', authenticateToken, contaminationController.addImage);
 
 /**
  * @swagger
@@ -269,6 +269,6 @@ router.post('/:id/images', authenticateToken, exports.addImage);
  *       403:
  *         description: No autorizado
  */
-router.put('/:id/status', authenticateToken, restrictToModerator, exports.updateReportStatus);
+router.put('/:id/status', authenticateToken, contaminationController.updateReportStatus);
 
 module.exports = router;
