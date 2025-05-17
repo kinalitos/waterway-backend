@@ -110,7 +110,7 @@ exports.refreshToken = async (req, res) => {
 
     let payload;
     try {
-      payload = jwt.verify(refreshToken, REFRESH_SECRET_TOKEN);
+      payload = await jwt.verify(refreshToken, REFRESH_SECRET_TOKEN);
     } catch (err) {
       return res.status(403).json({
         success: false,
