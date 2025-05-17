@@ -95,7 +95,79 @@ router.post('/signup', signupUser);
  */
 router.post('/login', loginUser);
 
-router.get("/refresh-token", refreshToken)
+/**
+ * @swagger
+ * /auth/refresh-token:
+ *   post:
+ *     summary: Refrescar el token de acceso usando un refresh token válido
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - token
+ *             properties:
+ *               token:
+ *                 type: string
+ *                 example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *     responses:
+ *       200:
+ *         description: Nuevo token de acceso generado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     accessToken:
+ *                       type: string
+ *       400:
+ *         description: No se proporcionó un refresh token
+ *       403:
+ *         description: Token inválido o expirado
+ *       404:
+ *         description: Usuario no encontrado
+ *       500:
+ *         description: Error interno del servidor
+ */
+router.post("/refresh-token", refreshToken)
+
+/**
+ * @swagger
+ * /auth/verify:
+ *   get:
+ *     summary: Verifica si un token de acceso es válido
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Token válido, usuario autenticado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *       401:
+ *         description: Token no proporcionado o inválido
+ *       500:
+ *         description: Error interno del servidor
+ */
 router.get("/verify", authenticateToken, verifyAuth)
 
 module.exports = router;
