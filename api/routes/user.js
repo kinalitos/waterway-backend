@@ -7,6 +7,7 @@ const {
   getUserById,
   updateUser,
   deleteUser,
+  changePassword,
 } = require('../controller/user');
 
 /**
@@ -70,6 +71,76 @@ router.post('/', authenticateToken, createUser);
  *         description: Lista de usuarios
  */
 router.get('/', authenticateToken, getAllUsers);
+
+
+/**
+ * @swagger
+ * /users/change-password:
+ *   put:
+ *     summary: Cambiar la contraseña del usuario actual
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - currentPassword
+ *               - newPassword
+ *               - confirmPassword
+ *             properties:
+ *               currentPassword:
+ *                 type: string
+ *                 description: Contraseña actual del usuario
+ *                 example: OldPassword123!
+ *               newPassword:
+ *                 type: string
+ *                 description: Nueva contraseña (mínimo 6 caracteres)
+ *                 example: NewPassword123!
+ *               confirmPassword:
+ *                 type: string
+ *                 description: Confirmación de la nueva contraseña
+ *                 example: NewPassword123!
+ *     responses:
+ *       200:
+ *         description: Contraseña actualizada exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Password updated successfully
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       example: 60d21b4667d0d8992e610c85
+ *                     name:
+ *                       type: string
+ *                       example: María López
+ *                     email:
+ *                       type: string
+ *                       example: maria@example.com
+ *                     role:
+ *                       type: string
+ *                       example: user
+ *       400:
+ *         description: Error de validación (contraseñas no coinciden)
+ *       401:
+ *         description: Contraseña actual incorrecta
+ *       404:
+ *         description: Usuario no encontrado
+ *       500:
+ *         description: Error del servidor
+ */
+router.put('/change-password', authenticateToken, changePassword)
+
 
 /**
  * @swagger
