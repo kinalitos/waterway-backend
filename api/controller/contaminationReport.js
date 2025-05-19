@@ -24,20 +24,45 @@ exports.createReport = async (req, res) => {
 // Get all reports or reports by user (Moderator function)
 exports.getAllReports = async (req, res) => {
   try {
-    const { userId, status } = req.query;
-    let query = {};
-    if (userId) query.created_by = userId;
-    if (status) query.status = status;
-    const reports = await ContaminationReport.find(query).populate('created_by', 'name email');
-    res.json(reports);
+    const { q, userId, status, page = 1, pageSize = 10 } = req.query;
+
+    const filter = {};
+
+    if (q) {
+      filter.$or = [
+        { title: { $regex: q, $options: 'i' } },
+        { description: { $regex: q, $options: 'i' } }
+      ];
+    }
+
+    if (userId) filter.created_by = userId;
+    if (status) filter.status = status;
+
+    const reports = await ContaminationReport.find(filter)
+      .populate('created_by', 'name email')
+      .limit(Number(pageSize))
+      .skip((Number(page) - 1) * Number(pageSize));
+
+    const totalReportsCount = await ContaminationReport.countDocuments(filter);
+
+    res.status(200).json({
+      totalPages: Math.ceil(totalReportsCount / pageSize),
+      currentPage: Number(page),
+      pageSize: Number(pageSize),
+      results: reports,
+    });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Server error' });
   }
 };
+;
 
 // Get report by ID
 exports.getReportById = async (req, res) => {
   try {
+
+    console.log(req.params.id)
+    console.log(await ContaminationReport.find())
     const report = await ContaminationReport.findById(req.params.id).populate('created_by', 'name email');
     if (!report) return res.status(404).json({ error: 'Report not found' });
     res.json(report);
