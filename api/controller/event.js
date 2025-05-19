@@ -38,17 +38,32 @@ exports.getAllEvents = async (req, res) => {
       }
     }
 
+    // Trae los eventos y los participantes
     const events = await Event.find(filter)
       .limit(Number(pageSize))
       .skip((Number(page) - 1) * Number(pageSize));
 
     const totalEventsCount = await Event.countDocuments(filter);
 
+    // ID del usuario autenticado (ajusta según tu auth)
+    const userId = req.user?.id || req.user?._id;
+
+    // Mapea los eventos y agrega el campo 'asistiendo'
+    const eventsWithAsistiendo = events.map(ev => {
+      const isAsistiendo = userId
+        ? ev.participants && ev.participants.includes(userId)
+        : false;
+      return {
+        ...ev.toObject(),
+        asistiendo: isAsistiendo,
+      };
+    });
+
     res.status(200).json({
       totalPages: Math.ceil(totalEventsCount / pageSize),
       currentPage: Number(page),
       pageSize: Number(pageSize),
-      results: events,
+      results: eventsWithAsistiendo,
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
