@@ -5,7 +5,7 @@ exports.createEvent = async (req, res) => {
     req.body.created_by = Date.now()
     req.body.updated_by = Date.now()
     req.body.created_by = req.user.id
-    if(req.body.date_end < req.body.date_start) {
+    if (req.body.date_end < req.body.date_start) {
       return res.status(400).json({ error: 'La fecha de inicio no puede ser mayor a la fecha de fin' });
     }
     const event = new Event(req.body)
@@ -18,16 +18,28 @@ exports.createEvent = async (req, res) => {
 
 exports.getAllEvents = async (req, res) => {
   try {
-    const { q } = req.query
+    const { q, page = 1, pageSize = 10 } = req.query;
+
     const filter = q ? {
       $or: [
         { title: { $regex: q, $options: 'i' } },
         { description: { $regex: q, $options: 'i' } },
         { location: { $regex: q, $options: 'i' } }
       ]
-    } : {}
+    } : {};
+
     const events = await Event.find(filter)
-    res.json(events);
+      .limit(Number(pageSize))
+      .skip((Number(page) - 1) * Number(pageSize));
+
+    const totalEventsCount = await Event.countDocuments(filter);
+
+    res.status(200).json({
+      totalPages: Math.ceil(totalEventsCount / pageSize),
+      currentPage: Number(page),
+      pageSize: Number(pageSize),
+      results: events,
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -39,7 +51,7 @@ exports.getEventById = async (req, res) => {
     if (!event) return res.status(404).json({ error: 'Not found' });
     const status = event.date_start < Date.now(0) ? 'finalizado' : 'activo';
     event.status = status;
-    res.json({event});
+    res.json({ event });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
