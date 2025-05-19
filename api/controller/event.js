@@ -32,9 +32,9 @@ exports.getAllEvents = async (req, res) => {
     if (date && direction) {
       const refDate = new Date(date);
       if (direction === "forward") {
-        filter.date_start = { ...filter.date_start, $gte: refDate };
+        filter.date_end = { ...filter.date_end, $gte: refDate };
       } else if (direction === "backward") {
-        filter.date_start = { ...filter.date_start, $lt: refDate };
+        filter.date_end = { ...filter.date_end, $lt: refDate };
       }
     }
 
@@ -66,6 +66,7 @@ exports.getAllEvents = async (req, res) => {
       results: eventsWithAsistiendo,
     });
   } catch (err) {
+    console.log(err)
     res.status(500).json({ error: err.message });
   }
 };

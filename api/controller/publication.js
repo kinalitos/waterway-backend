@@ -15,10 +15,37 @@ exports.createPublication = async (req, res) => {
 
 exports.getAllPublications = async (req, res) => {
   try {
-    const publications = await Publication.find();
-    res.json(publications);
+    const { q, created_by, page = 1, pageSize = 10 } = req.query;
+
+    const filter = {};
+
+    if (q) {
+      filter.$or = [
+        { title: { $regex: q, $options: 'i' } },
+        { content: { $regex: q, $options: 'i' } },
+      ];
+    }
+
+    if (created_by) {
+      filter.created_by = created_by;
+    }
+
+    const publications = await Publication.find(filter)
+      .sort({ created_at: -1 }) // Más recientes primero
+      .limit(Number(pageSize))
+      .skip((Number(page) - 1) * Number(pageSize));
+
+    const totalCount = await Publication.countDocuments(filter);
+
+    res.status(200).json({
+      totalPages: Math.ceil(totalCount / pageSize),
+      currentPage: Number(page),
+      pageSize: Number(pageSize),
+      results: publications,
+    });
+
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Server error' });
   }
 };
 
