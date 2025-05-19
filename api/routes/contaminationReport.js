@@ -49,11 +49,11 @@ const { authenticateToken } = require('../middleware/auth.middleware');
  *                   properties:
  *                     image_key:
  *                       type: string
- *                       example: imagen123.jpg
+ *                       example: https://res.cloudinary.com/dv8tyo83a/image/upload/v1234567890/contamination_reports/sample.jpg
  *                     uploaded_at:
  *                       type: string
  *                       format: date-time
- *                       example: 2025-05-16T08:06:00Z
+ *                       example: 2025-05-18T08:06:00Z
  *     responses:
  *       201:
  *         description: Reporte creado exitosamente
@@ -150,11 +150,11 @@ router.get('/:id', authenticateToken, contaminationController.getReportById);
  *                   properties:
  *                     image_key:
  *                       type: string
- *                       example: imagen456.jpg
+ *                       example: https://res.cloudinary.com/dv8tyo83a/image/upload/v1234567890/contamination_reports/sample.jpg
  *                     uploaded_at:
  *                       type: string
  *                       format: date-time
- *                       example: 2025-05-16T08:06:00Z
+ *                       example: 2025-05-18T08:06:00Z
  *     responses:
  *       200:
  *         description: Reporte actualizado
@@ -214,11 +214,18 @@ router.delete('/:id', authenticateToken, contaminationController.deleteReport);
  *           schema:
  *             type: object
  *             required:
- *               - image_key
+ *               - image
  *             properties:
- *               image_key:
- *                 type: string
- *                 example: imagen789.jpg
+ *               image:
+ *                 type: object
+ *                 properties:
+ *                   image_key:
+ *                     type: string
+ *                     example: https://res.cloudinary.com/dv8tyo83a/image/upload/v1234567890/contamination_reports/sample.jpg
+ *                   uploaded_at:
+ *                     type: string
+ *                     format: date-time
+ *                     example: 2025-05-18T08:06:00Z
  *     responses:
  *       200:
  *         description: Imagen agregada exitosamente
