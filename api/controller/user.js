@@ -1,16 +1,37 @@
 const { v4: uuidv4 } = require('uuid');
 const User = require('../model/user');
+const bcrypt = require("bcrypt");
 
-// Crear usuario (solo admins o moderadores)
 exports.createUser = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
+
     if (!name || !email || !password || !role) {
       return res.status(400).json({ error: 'All fields are required' });
     }
-    const user = new User({ _id: uuidv4(), name, email, password, role });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = new User({
+      _id: uuidv4(),
+      name,
+      email,
+      password: hashedPassword,
+      role
+    });
+
     await user.save();
-    res.status(201).json({ message: 'User created', user: { id: user._id, name, email, role } });
+
+    res.status(201).json({
+      message: 'User created',
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }
+    });
+
   } catch (error) {
     if (error.code === 11000) {
       return res.status(400).json({ error: 'Email already exists' });
@@ -22,8 +43,32 @@ exports.createUser = async (req, res) => {
 // Obtener todos los usuarios
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.find().select('-password');
-    res.status(200).json(users);
+    const { q, role, page, pageSize, } = req.query
+    const filter = q ? {
+      $or: [
+        { name: { $regex: q, $options: 'i' } },
+        { last_name: { $regex: q, $options: 'i' } },
+        { email: { $regex: q, $options: 'i' } },
+      ]
+    } : {}
+    if (role) {
+      filter.role = role;
+    }
+    // filter.page = page || 1;
+    // filter.pageSize = pageSize || 10;
+
+    const users = await User.find(filter)
+      .limit(pageSize || 10)
+      .skip((page - 1) * pageSize)
+      .select('-password');
+
+    const totalUsersCount = await User.countDocuments(filter);
+    res.status(200).json({
+      totalPages: Math.ceil(totalUsersCount / pageSize),
+      currentPage: page,
+      pageSize: pageSize,
+      results: users,
+    });
   } catch (error) {
     res.status(500).json({ error: 'Server error' });
   }
@@ -45,16 +90,28 @@ exports.getUserById = async (req, res) => {
 // Actualizar usuario
 exports.updateUser = async (req, res) => {
   try {
-    const { name, email, role } = req.body;
+    const { name, email, role, password } = req.body;
     const user = await User.findById(req.params.id);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
+
     if (name) user.name = name;
     if (email) user.email = email;
     if (role) user.role = role;
+    if (password) user.password = await bcrypt.hash(password, 10);
+
     await user.save();
-    res.status(200).json({ message: 'User updated', user: { id: user._id, name: user.name, email: user.email, role: user.role } });
+
+    res.status(200).json({
+      message: 'User updated',
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      }
+    });
   } catch (error) {
     if (error.code === 11000) {
       return res.status(400).json({ error: 'Email already exists' });
