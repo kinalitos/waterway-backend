@@ -102,12 +102,10 @@ exports.deleteReport = async (req, res) => {
   try {
     const report = await ContaminationReport.findById(req.params.id);
     if (!report) return res.status(404).json({ error: 'Report not found' });
-    if (report.created_by.toString() !== req.user.id && !['moderador', 'administrador'].includes(req.user.role)) {
-      return res.status(403).json({ error: 'Unauthorized to delete this report' });
-    }
     await ContaminationReport.deleteOne({ _id: req.params.id });
     res.json({ message: 'Report deleted' });
   } catch (err) {
+    console.log(err)
     res.status(500).json({ error: err.message });
   }
 };
