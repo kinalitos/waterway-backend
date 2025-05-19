@@ -54,6 +54,49 @@ router.post('/', authenticateToken, publicationController.createPublication);
  */
 router.get('/', publicationController.getAllPublications);
 
+
+/**
+ * @swagger
+ * /publications/user:
+ *   get:
+ *     summary: Obtener publicaciones del usuario autenticado
+ *     tags: [Publications]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de publicaciones del usuario autenticado
+ *       401:
+ *         description: No autorizado
+ *       500:
+ *         description: Error del servidor
+ */
+router.get('/user', authenticateToken, publicationController.getPublicationsByUser);
+/**
+ * @swagger
+ * /publications/filter:
+ *   get:
+ *     summary: Filtrar publicaciones por título y/o contenido
+ *     tags: [Publications]
+ *     parameters:
+ *       - in: query
+ *         name: title
+ *         schema:
+ *           type: string
+ *         description: Texto parcial del título a buscar (opcional)
+ *       - in: query
+ *         name: content
+ *         schema:
+ *           type: string
+ *         description: Texto parcial del contenido a buscar (opcional)
+ *     responses:
+ *       200:
+ *         description: Lista de publicaciones filtradas
+ *       500:
+ *         description: Error del servidor
+ */
+router.get('/filter', publicationController.filterPublications);
+
 /**
  * @swagger
  * /publications/{id}:
@@ -135,5 +178,6 @@ router.put('/:id', authenticateToken, publicationController.updatePublication);
  *         description: Publicación no encontrada
  */
 router.delete('/:id', authenticateToken, publicationController.deletePublication);
+
 
 module.exports = router;

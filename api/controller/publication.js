@@ -51,3 +51,49 @@ exports.deletePublication = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.getPublicationsByUser = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    console.log("HOLA",userId)
+    const publications = await Publication.find({ created_by: userId });
+    res.json(publications);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.searchPublications = async (req, res) => {
+  try {
+    const { query } = req.query;
+    if (!query) return res.status(400).json({ error: 'Query string is required' });
+
+    const regex = new RegExp(query, 'i'); // 'i' para que sea case-insensitive
+    const publications = await Publication.find({
+      $or: [
+        { title: { $regex: regex } },
+        { content: { $regex: regex } }
+      ]
+    });
+
+    res.json(publications);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.filterPublications = async (req, res) => {
+  try {
+    const { title, content } = req.query;
+    const filter = {};
+
+    if (title) filter.title = { $regex: title, $options: "i" };
+    if (content) filter.content = { $regex: content, $options: "i" };
+
+    const publications = await Publication.find(filter);
+    res.json(publications);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
