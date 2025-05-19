@@ -63,10 +63,6 @@ exports.loginUser = async (req, res) => {
       });
     }
 
-    const role = user.role
-    const nombre = user.name
-    const id = user._id
-
     const accessToken = jwt.sign(
       { id: user._id },
       ACCESS_SECRET_TOKEN,
@@ -85,10 +81,6 @@ exports.loginUser = async (req, res) => {
       data: {
         accessToken,
         refreshToken,
-        role,
-        nombre,
-        id
-        
       },
     });
   } catch (err) {
