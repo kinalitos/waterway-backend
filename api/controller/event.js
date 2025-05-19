@@ -18,7 +18,7 @@ exports.createEvent = async (req, res) => {
 
 exports.getAllEvents = async (req, res) => {
   try {
-    const { q, page = 1, pageSize = 10 } = req.query;
+    const { q, page = 1, pageSize = 10, date, direction } = req.query;
 
     const filter = q ? {
       $or: [
@@ -27,6 +27,16 @@ exports.getAllEvents = async (req, res) => {
         { location: { $regex: q, $options: 'i' } }
       ]
     } : {};
+
+    // Filtrado por fecha opcional
+    if (date && direction) {
+      const refDate = new Date(date);
+      if (direction === "forward") {
+        filter.date_start = { ...filter.date_start, $gte: refDate };
+      } else if (direction === "backward") {
+        filter.date_start = { ...filter.date_start, $lt: refDate };
+      }
+    }
 
     const events = await Event.find(filter)
       .limit(Number(pageSize))
