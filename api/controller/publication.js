@@ -2,6 +2,9 @@ const Publication = require('../model/publication');
 
 exports.createPublication = async (req, res) => {
   try {
+
+    req.body.created_by = req.user.id
+
     const publication = new Publication(req.body);
     await publication.save();
     res.status(201).json(publication);

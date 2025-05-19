@@ -75,3 +75,25 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+/* exports.getMyUser = async (req, res) => {
+  try {
+    // El middleware ya validó que el usuario existe
+    const user = req.user.toObject(); // Convertir a objeto plano
+    
+    // Eliminar campos sensibles
+    const { password, refreshToken, ...userData } = user;
+    
+    res.status(200).json({
+      success: true,
+      message: 'User information retrieved successfully',
+      data: userData
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching user data',
+      error: error.message
+    });
+  }
+}; */
