@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 
 exports.createUser = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, location } = req.body;
 
     if (!name || !email || !password || !role) {
       return res.status(400).json({ error: 'All fields are required' });
@@ -17,7 +17,8 @@ exports.createUser = async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      role
+      role,
+      ...(location && { location })
     });
 
     await user.save();
@@ -28,7 +29,8 @@ exports.createUser = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role
+        role: user.role,
+        location: user.location,
       }
     });
 
@@ -49,6 +51,7 @@ exports.getAllUsers = async (req, res) => {
         { name: { $regex: q, $options: 'i' } },
         { last_name: { $regex: q, $options: 'i' } },
         { email: { $regex: q, $options: 'i' } },
+        { location: { $regex: q, $options: 'i' } },
       ]
     } : {}
     if (role) {
@@ -90,15 +93,17 @@ exports.getUserById = async (req, res) => {
 // Actualizar usuario
 exports.updateUser = async (req, res) => {
   try {
-    const { name, email, role, password } = req.body;
+    const { name, email, role, password, location } = req.body;
     const user = await User.findById(req.params.id);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
+
     if (name) user.name = name;
     if (email) user.email = email;
     if (role) user.role = role;
+    if (location) user.location = location;
     if (password) user.password = await bcrypt.hash(password, 10);
 
     await user.save();
@@ -119,6 +124,46 @@ exports.updateUser = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+
+// Cambiar contraseña
+exports.changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+
+    // Validate passwords match
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ error: 'New password and confirmation do not match' });
+    }
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Verify current password
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: 'Current password is incorrect' });
+    }
+
+    // Update password
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    res.status(200).json({
+      message: 'Password updated successfully',
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      }
+    });
+  } catch (error) {
+    console.error('Change password error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+}
 
 // Eliminar usuario
 exports.deleteUser = async (req, res) => {
