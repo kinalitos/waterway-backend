@@ -16,7 +16,7 @@ exports.createPublication = async (req, res) => {
 exports.getAllPublications = async (req, res) => {
   try {
     const { q, created_by, page = 1, pageSize = 10 } = req.query;
-
+      
     const filter = {};
 
     if (q) {
@@ -33,7 +33,8 @@ exports.getAllPublications = async (req, res) => {
     const publications = await Publication.find(filter)
       .sort({ created_at: -1 }) // Más recientes primero
       .limit(Number(pageSize))
-      .skip((Number(page) - 1) * Number(pageSize));
+      .skip((Number(page) - 1) * Number(pageSize))
+      .populate('created_by', 'name email avatar');;
 
     const totalCount = await Publication.countDocuments(filter);
 
@@ -43,7 +44,7 @@ exports.getAllPublications = async (req, res) => {
       pageSize: Number(pageSize),
       results: publications,
     });
-
+    console.log(publications)
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }
@@ -83,7 +84,7 @@ exports.getPublicationsByUser = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    console.log("HOLA",userId)
+    console.log("HOLA", userId)
     const publications = await Publication.find({ created_by: userId });
     res.json(publications);
   } catch (err) {
